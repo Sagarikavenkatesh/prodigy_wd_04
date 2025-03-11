@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f0f8ff;
+        }
+        h1 {
+            color: #333;
+        }
+        .stopwatch {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .laps {
+            margin-top: 20px;
+            list-style: none;
+            padding: 0;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #ff5733;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stopwatch</h1>
+    <div class="stopwatch">00:00:00.000</div>
+    <button onclick="startStop()">Start</button>
+    <button onclick="lap()">Lap</button>
+    <button onclick="reset()">Reset</button>
+    <ul class="laps"></ul>
+    <div class="result"></div>
+
+    <script>
+        let startTime, updatedTime, difference, tInterval;
+        let running = false;
+        let lapCount = 0;
+
+        function startStop() {
+            if (!running) {
+                startTime = new Date().getTime() - (difference || 0);
+                tInterval = setInterval(updateTime, 1);
+                running = true;
+                document.querySelector("button").textContent = "Pause";
+            } else {
+                clearInterval(tInterval);
+                running = false;
+                document.querySelector("button").textContent = "Start";
+                document.querySelector(".result").textContent = `Final Time: ${document.querySelector(".stopwatch").textContent}`;
+            }
+        }
+
+        function updateTime() {
+            updatedTime = new Date().getTime();
+            difference = updatedTime - startTime;
+            let hours = Math.floor(difference / 3600000);
+            let minutes = Math.floor((difference % 3600000) / 60000);
+            let seconds = Math.floor((difference % 60000) / 1000);
+            let milliseconds = difference % 1000;
+            document.querySelector(".stopwatch").textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+        }
+
+        function lap() {
+            if (running) {
+                let lapTime = document.querySelector(".stopwatch").textContent;
+                let lapItem = document.createElement("li");
+                lapItem.textContent = `Lap ${++lapCount}: ${lapTime}`;
+                document.querySelector(".laps").appendChild(lapItem);
+            }
+        }
+
+        function reset() {
+            clearInterval(tInterval);
+            running = false;
+            difference = 0;
+            lapCount = 0;
+            document.querySelector(".stopwatch").textContent = "00:00:00.000";
+            document.querySelector("button").textContent = "Start";
+            document.querySelector(".laps").innerHTML = "";
+            document.querySelector(".result").textContent = "";
+        }
+    </script>
+</body>
+</html>
